@@ -1,8 +1,9 @@
 import express from "express";
-import { saveSearchState } from "../controllers/search.controller.js";
+import { recipeDetail, recommendRecipes} from "../controllers/search.controller.js";
 
 const router = express.Router();
 
-router.post("/state", saveSearchState);
+router.post("/generate", recommendRecipes)
+router.get("/recipe/:name", recipeDetail)
 
 export default router;

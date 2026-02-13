@@ -74,9 +74,14 @@ function updateMealButtons() {
 }
 
 document.getElementById("generateBtn").onclick = async () => {
-    await fetch("/api/search/state", {
+    const response = await fetch("/api/search/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(state)
     });
+
+    const html = await response.text();
+    document.open();
+    document.write(html);
+    document.close();
 };
