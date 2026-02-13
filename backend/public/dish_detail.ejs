@@ -58,13 +58,8 @@
                         <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">What'sInMyFridge</h2>
                     </div>
                     <div class="hidden md:flex items-center gap-9">
-                        <a class="text-sm font-medium leading-normal hover:text-primary" href="./dashboard.html">Home</a>
-                        <a class="hover:text-primary text-sm font-medium leading-normal" href="./recommend.html"
-                            >Suggestions</a
-                        >
-                        <a class="text-sm font-medium leading-normal hover:text-primary" href="./ingredient_input.html"
-                            >Upload</a
-                        >
+                        <a class="text-sm font-medium leading-normal hover:text-primary" href="./search.html">Search</a>
+                        
                     </div>
                 </header>
 
@@ -108,7 +103,8 @@
                                         >
                                             Prep Time
                                         </p>
-                                        <p class="tracking-light text-2xl font-bold leading-tight"><%= recipe.PrepTimeInMins %> mins</p>
+                                        <p class="tracking-light text-2xl font-bold leading-tight"><%= recipe.PrepTimeInMins ?? 'N/A' %> 
+                                        <%= recipe.PrepTimeInMins ? 'mins' : '' %> </p>
                                     </div>
 
                                     <div
@@ -119,7 +115,8 @@
                                         >
                                             Cook Time
                                         </p>
-                                        <p class="tracking-light text-2xl font-bold leading-tight"><%= recipe.CookTimeInMins %> mins</p>
+                                        <p class="tracking-light text-2xl font-bold leading-tight"> <%= recipe.CookTimeInMins ?? 'N/A' %> 
+                                         <%= recipe.CookTimeInMins ? 'mins' : '' %></p>
                                     </div>
 
                                     <div
@@ -130,7 +127,7 @@
                                         >
                                             Servings
                                         </p>
-                                        <p class="tracking-light text-2xl font-bold leading-tight"><%= recipe['Servings'] %></p>
+                                        <p class="tracking-light text-2xl font-bold leading-tight"><%= recipe.Servings ?? 'N/A' %></p>
                                     </div>
                                 </div>
 
