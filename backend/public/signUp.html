@@ -80,26 +80,70 @@
                         </p>
                     </div>
 
-                    <form class="space-y-3" method="POST" action="/api/auth/signup">
+                    <form class="space-y-3" method="POST" action="/api/auth/signup" id="signupForm">
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[#111811] dark:text-white text-sm font-medium">
+                                Username
+                            </label>
+                            <input
+                                id="username"
+                                class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm"
+                                placeholder="Enter username"
+                                type="text"
+                                name="username"
+                                required
+                            />
+                        </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[#111811] dark:text-white text-sm font-medium">
                                 Email
                             </label>
-                            <input id="email" class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm" placeholder="example@email.com" type="email" name="email"/>
+                            <input id="email" class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm" placeholder="example@gmail.com" type="email" name="email" pattern=".*@gmail\.com$" required/>
+                            <p id="emailError" class="text-red-600 text-xs hidden">Email must end with @gmail.com</p>
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-[#111811] dark:text-white text-sm font-medium">
                                 Password
                             </label>
-                            <input id="password" class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm" placeholder="••••••••" type="password" name="password"/>
+                            <input
+                            id="password"
+                            class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm"
+                            placeholder="••••••••"
+                            type="password"
+                            name="password"
+                            pattern="^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]).*$"
+                            required
+                            />
+
+                            <p id="passwordError" class="text-red-600 text-xs hidden">Password must contain 1 capital letter and 1 special character</p>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[#111811] dark:text-white text-sm font-medium">
+                                Confirm Password
+                            </label>
+                            <input
+                                id="confirmPassword"
+                                class="form-input w-full rounded-lg border-[#dbe6db] dark:border-[#2a3d2a] dark:bg-[#1a2e1a] dark:text-white focus:ring-primary focus:border-primary h-12 placeholder:text-[#618961] px-4 text-sm"
+                                placeholder="••••••••"
+                                type="password"
+                                name="confirmPassword"
+                                required
+                            />
+                            <p id="confirmError" class="text-red-600 text-xs hidden">
+                                Passwords do not match
+                            </p>
                         </div>
 
                         <button class="w-full flex items-center justify-center rounded-lg h-12 bg-primary text-[#111811] text-base font-bold hover:opacity-90 transition-opacity" type="submit">
                             Sign Up
                         </button>
                     </form>
+
+                    <p id="signupError" class="text-red-600 text-sm hidden mt-4"></p>
 
                     <p class="text-center text-[#111811] dark:text-white text-sm">
                         Already have an account?
@@ -110,5 +154,86 @@
                 </div>
             </div>
         </main>
+
+        <script>
+            const form = document.getElementById('signupForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const confirmError = document.getElementById('confirmError');
+
+            function validateEmail() {
+                const email = emailInput.value;
+                const isValid = email.includes('@gmail.com');
+                if (!isValid && email.length > 0) {
+                    emailError.classList.remove('hidden');
+                } else {
+                    emailError.classList.add('hidden');
+                }
+                return isValid || !email.length;
+            }
+
+            function validatePassword() {
+                const password = passwordInput.value;
+                const hasCapital = /[A-Z]/.test(password);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]/.test(password);
+                const isValid = hasCapital && hasSpecial;
+                if (!isValid && password.length > 0) {
+                    passwordError.classList.remove('hidden');
+                } else {
+                    passwordError.classList.add('hidden');
+                }
+                return isValid || !password.length;
+            }
+
+            function validateConfirmPassword() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                const isValid = password === confirmPassword;
+
+                if (!isValid && confirmPassword.length > 0) {
+                    confirmError.classList.remove('hidden');
+                } else {
+                    confirmError.classList.add('hidden');
+                }
+
+                return isValid || !confirmPassword.length;
+            }
+
+            emailInput.addEventListener('blur', validateEmail);
+            passwordInput.addEventListener('blur', validatePassword);
+            confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+
+            form.addEventListener('submit', function(e) {
+                const emailValid = validateEmail();
+                const passwordValid = validatePassword();
+                const confirmValid = validateConfirmPassword();
+
+                if (!emailValid || !passwordValid || !confirmValid) {
+                    e.preventDefault();
+                    if (!emailValid) emailError.classList.remove('hidden');
+                    if (!passwordValid) passwordError.classList.remove('hidden');
+                    if (!confirmValid) confirmError.classList.remove('hidden');
+                }
+            });
+
+            // Show server-side signup error if present in query params
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('error') === 'exists') {
+                const signupError = document.getElementById('signupError');
+                if (signupError) {
+                    signupError.innerHTML = 'Account already exists. Please <a href="./signIn.html" class="font-bold underline">sign in</a> instead.';
+                    signupError.classList.remove('hidden');
+                }
+            }
+            if (params.get('error') === 'password') {
+                const signupError = document.getElementById('signupError');
+                signupError.innerText = 'Passwords do not match.';
+                signupError.classList.remove('hidden');
+            }
+        </script>
     </body>
 </html>

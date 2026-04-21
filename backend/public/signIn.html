@@ -95,7 +95,7 @@
                         </p>
                     </div>
 
-                    <form class="space-y-6" method="POST" action="/api/auth/signin">
+                    <form class="space-y-6" method="POST" action="/api/auth/signin" id="signinForm">
                         <!-- Email Field -->
                         <div class="flex flex-col gap-2">
                             <label class="text-[#111811] dark:text-gray-200 text-sm font-semibold">
@@ -104,8 +104,9 @@
                             <input
                                 class="form-input w-full rounded-lg border border-[#dbe6db] dark:border-gray-700 bg-white dark:bg-[#102210] h-14 px-4 text-[#111811] dark:text-white placeholder:text-[#618961] focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                                 placeholder="Enter your email address"
-                                type="email" name="email" id="email"
+                                type="email" name="email" id="email" pattern=".*@gmail\.com$" required
                             />
+                            <p id="emailError" class="text-red-600 text-xs hidden">Email must end with @gmail.com</p>
                         </div>
 
                         <!-- Password Field -->
@@ -121,11 +122,17 @@
 
                             <div class="relative group">
                                 <input
-                                    class="form-input w-full rounded-lg border border-[#dbe6db] dark:border-gray-700 bg-white dark:bg-[#102210] h-14 px-4 text-[#111811] dark:text-white placeholder:text-[#618961] focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                                    placeholder="Enter your password"
-                                    type="password" name="password" id="password"
+                                class="form-input w-full rounded-lg border border-[#dbe6db] dark:border-gray-700 bg-white dark:bg-[#102210] h-14 px-4 text-[#111811] dark:text-white placeholder:text-[#618961] focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                                placeholder="Enter your password"
+                                type="password"
+                                name="password"
+                                id="password"
+                                pattern="^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]).*$"
+                                required
                                 />
+
                             </div>
+                            <p id="passwordError" class="text-red-600 text-xs hidden">Password must contain 1 capital letter and 1 special character</p>
                         </div>
 
                         <!-- Submit Button -->
@@ -139,6 +146,8 @@
                             </span>
                         </button>
                     </form>
+
+                    <p id="authError" class="text-red-600 text-sm hidden mt-4">Invalid email or password</p>
 
                     <!-- <div class="relative my-8">
                         <div class="absolute inset-0 flex items-center">
@@ -193,5 +202,66 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            const form = document.getElementById('signinForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            function validateEmail() {
+                const email = emailInput.value;
+                const isValid = email.includes('@gmail.com');
+                if (!isValid && email.length > 0) {
+                    emailError.classList.remove('hidden');
+                } else {
+                    emailError.classList.add('hidden');
+                }
+                return isValid || !email.length;
+            }
+
+            function validatePassword() {
+                const password = passwordInput.value;
+                const hasCapital = /[A-Z]/.test(password);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]/.test(password);
+                const isValid = hasCapital && hasSpecial;
+                if (!isValid && password.length > 0) {
+                    passwordError.classList.remove('hidden');
+                } else {
+                    passwordError.classList.add('hidden');
+                }
+                return isValid || !password.length;
+            }
+
+            emailInput.addEventListener('blur', validateEmail);
+            passwordInput.addEventListener('blur', validatePassword);
+
+            form.addEventListener('submit', function(e) {
+                const emailValid = validateEmail();
+                const passwordValid = validatePassword();
+
+                if (!emailValid || !passwordValid) {
+                    e.preventDefault();
+                    if (!emailValid) emailError.classList.remove('hidden');
+                    if (!passwordValid) passwordError.classList.remove('hidden');
+                }
+            });
+
+                    // Show server-side auth error if present in query params
+                    const params = new URLSearchParams(window.location.search);
+                    const authError = document.getElementById('authError');
+                    if (params.get('error') === 'invalid') {
+                        if (authError) {
+                            authError.textContent = 'Invalid email or password';
+                            authError.classList.remove('hidden');
+                        }
+                    } else if (params.get('error') === 'notfound') {
+                        if (authError) {
+                            authError.innerHTML = 'Email not found. Please <a href="./signUp.html" class="font-bold underline">sign up</a> first.';
+                            authError.classList.remove('hidden');
+                        }
+                    }
+        </script>
     </body>
 </html>

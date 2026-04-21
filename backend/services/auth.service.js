@@ -40,3 +40,8 @@ export const validateUser = (email, password) => {
         (user) => user.email === email && user.password === password
     );
 };
+
+export const emailExists = (email) => {
+    const users = readUsers();
+    return users.some((user) => user.email === email);
+};
