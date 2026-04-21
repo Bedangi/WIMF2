@@ -1,19 +1,22 @@
 import { saveUser, validateUser, emailExists } from "../services/auth.service.js";
 
-export const signup = (req, res) => {
-    const { email, password } = req.body;
+export const signup =async (req, res) => {
+    const { username, email, password, confirmPassword} = req.body;
 
+    if (password !== confirmPassword) {
+        return res.redirect('/signUp.html?error=password');
+    }
     // If the exact credentials already exist, ask the user to sign in instead
-    if (validateUser(email, password)) {
+    if (await emailExists(email)) {
         return res.redirect('/signUp.html?error=exists');
     }
 
-    saveUser({ email, password });
+    await saveUser(req.body);
 
     return res.redirect("/home.html");
 };
 
-export const signin = (req, res) => {
+export const signin = async (req, res) => {
     const { email, password } = req.body;
 
     const isValid = validateUser(email, password);

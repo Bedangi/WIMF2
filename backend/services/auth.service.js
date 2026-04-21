@@ -1,47 +1,24 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import User from "../models/user.model.js";
+import bcrypt from "bcrypt";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dataFilePath = path.join(__dirname, "../data/users.json");
-
-const readUsers = () => {
-    if (!fs.existsSync(dataFilePath)) {
-        return [];
-    }
-
-    const data = fs.readFileSync(dataFilePath, "utf-8");
-
-    if (data.trim() === "") {
-        return [];
-    }
-
-    return JSON.parse(data);
+export const saveUser = async (userData) => {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const user = new User({ ...userData,
+        password: hashedPassword,
+        createdAt: new Date() });
+    delete user._doc.confirmPassword;
+    await user.save();
 };
 
-export const saveUser = ({ email, password }) => {
-    const users = readUsers();
-
-    users.push({
-        email,
-        password,
-        createdAt: new Date().toISOString()
-    });
-
-    fs.writeFileSync(dataFilePath, JSON.stringify(users, null, 4));
+export const validateUser = async (email, password) => {
+    const user = await User.findOne({ email });
+    if (!user) return false;
+    const isMatch = await bcrypt.compare(password, user.password);
+    return isMatch;
 };
 
-export const validateUser = (email, password) => {
-    const users = readUsers();
-
-    return users.some(
-        (user) => user.email === email && user.password === password
-    );
-};
-
-export const emailExists = (email) => {
-    const users = readUsers();
-    return users.some((user) => user.email === email);
+export const emailExists = async (email) => {
+    const user = await User.findOne({ email });
+    console.log("Checking if email exists:", email, "Found user:", user);
+    return !!user;
 };

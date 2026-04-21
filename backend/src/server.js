@@ -1,4 +1,6 @@
 import app from "./app.js";
+import { connectDB } from "../public/js/db.js";
+connectDB();
 
 const PORT = process.env.PORT || 3000;
 
